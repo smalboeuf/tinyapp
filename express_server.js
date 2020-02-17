@@ -8,9 +8,17 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.set('view engine', 'ejs');
 
 function generateRandomString() {
+  let randomString = "";  
+  let alphabet = "abcdefghijklmnopqrstuvwxyz";
   
-}
+  for (let i = 0; i < 6; i++) {
+    let randomNumb =  Math.floor(Math.random() * 26);
 
+    randomString += alphabet[randomNumb];
+  }
+
+  return randomString;
+}
 
 
 const urlDatabase = {
