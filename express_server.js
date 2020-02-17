@@ -71,3 +71,15 @@ app.get("/u/:shortURL", (req, res) => {
   }
 
 });
+
+app.post("/urls/:shortURL/delete", (req, res) => {
+ 
+  if (req.params.shortURL[0] === ':') {
+    delete urlDatabase[req.params.shortURL.slice(1)];
+  } else {
+    delete urlDatabase[req.params.shortURL];
+  }
+
+
+  res.redirect("/urls/");
+});
