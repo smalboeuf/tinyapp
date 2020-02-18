@@ -11,13 +11,12 @@
       </div>
     </div>
     
-    
-    <% if (username) { %>
-      <label>Logged in as <%= username %> ! &nbsp;</label>
-     <form method="POST" class="inline-block" action="/logout"><button class="btn btn-primary">Logout</button></form>
+    <% if (id) { %>
+      <label>Logged in as <%= user.email %> ! &nbsp;</label>
+     <form method="POST" class="inline-block" action="/logout"><button class="btn btn-outline-light">Logout</button></form>
     <% } else { %>
-      <form method="POST" class= "inline-block" action="/login"><input type="text" name="username" placeholder="Username">
-      <button class="btn btn-primary">Sign in</button></form>
+      <form method="GET" class= "inline-block" action="/login"><button class="btn btn-outline-light">Login</button></form> &nbsp;&nbsp;
+      <form method="GET" class= "inline-block" action="/register"><button class="btn btn-outline-light">Register</button></form>
     <% } %>
     
   </nav>
