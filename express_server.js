@@ -52,7 +52,8 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-  let templateVars = { shortURL: req.params.shortURL, longURL: req.params.longURL };
+  let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL.slice(1)] };
+  
   res.render("urls_show", templateVars);
 });
 
@@ -72,6 +73,7 @@ app.get("/u/:shortURL", (req, res) => {
 
 });
 
+//Deletes a shortURL from the list
 app.post("/urls/:shortURL/delete", (req, res) => {
  
   if (req.params.shortURL[0] === ':') {
