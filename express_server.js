@@ -40,7 +40,6 @@ app.get("/urls", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  console.log(req.body);  // Log the POST request body to the console
   //Store the new long URL in the database with a randomly generated short URL
   let randomString = generateRandomString();
   urlDatabase[randomString] = req.body.longURL;
@@ -60,15 +59,18 @@ app.get("/urls/:shortURL", (req, res) => {
 app.get("/u/:shortURL", (req, res) => {
 
   let newURL = "";
+  let templateVars = {};
   
   if (req.params.shortURL[0] === ':') {
     
     newURL = urlDatabase[req.params.shortURL.slice(1)];
-    res.redirect(newURL);
+    templateVars = {shortURL: req.params.shortURL.slice(1), longURL: urlDatabase[req.params.shortURL.slice(1)]};
+    res.redirect(newURL, templateVars);
   } else {
     
     newURL = urlDatabase[req.params.shortURL];
-    res.redirect(newURL);
+    templateVars = {shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL]};
+    res.redirect(newURL, templateVars);
   }
 
 });
@@ -80,6 +82,23 @@ app.post("/urls/:shortURL/delete", (req, res) => {
     delete urlDatabase[req.params.shortURL.slice(1)];
   } else {
     delete urlDatabase[req.params.shortURL];
+  }
+
+
+  res.redirect("/urls/");
+});
+
+//When you edit an existing URL
+app.post("/urls/:shortURL/checkEdit", (req, res) => {
+ 
+  
+  console.log("shortURL", req.params.shortURL);
+
+  if (req.params.shortURL[0] === ':') {
+    urlDatabase[req.params.shortURL.slice(1)] = req.body.longURL; 
+   
+  } else {
+    urlDatabase[req.params.shortURL] = req.body.longURL;
   }
 
 
