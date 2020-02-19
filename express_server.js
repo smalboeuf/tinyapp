@@ -39,7 +39,7 @@ const users = {
 };
 
 ///////////////
-//Ports      
+//Ports
 ///////////////
 
 app.listen(PORT, () => {
@@ -80,15 +80,14 @@ app.get("/urls/new", (req, res) => {
     let templateVars = { id: req.session.user_id, user: users[req.session.user_id], error: false};
     res.render("urls_new", templateVars);
   } else {
-
     res.redirect('/login');
   }
 
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-
-  if(urlDatabase[req.params.shortURL.slice(1)]) {
+  //Checks the database to see if it exists
+  if (urlDatabase[req.params.shortURL.slice(1)]) {
     if (req.session.user_id) {
       let templateVars = { id: req.session.user_id, user: users[req.session.user_id], shortURL: req.params.shortURL.slice(1), longURL: urlDatabase[req.params.shortURL.slice(1)], error: false};
       res.render("urls_show", templateVars);
@@ -96,19 +95,22 @@ app.get("/urls/:shortURL", (req, res) => {
       res.redirect('/urls');
     }
   } else {
+    //If the shortURL does not exist, go to error page
     res.redirect('/urls/:shortURL/error');
   }
 
   
 });
 
+//When there is an error redirect the page and show error
 app.get("/urls/:shortURL/error", (req, res) => {
 
   let templateVars = { id: req.session.user_id, user: users[req.session.user_id], shortURL: req.params.shortURL.slice(1), longURL: urlDatabase[req.params.shortURL.slice(1)], error: true };
 
-  res.render('emptyURL', templateVars)
+  res.render('emptyURL', templateVars);
 });
 
+//When the shortURL is clicked on, redirect to that URL
 app.get("/u/:shortURL", (req, res) => {
 
   let newURL = "";
@@ -161,10 +163,6 @@ app.post("/urls/:shortURL/checkEdit", (req, res) => {
 });
 
 
-
-
-
-
 //Login
 
 app.get("/login", (req, res) => {
@@ -198,8 +196,8 @@ app.post("/login", (req, res) => {
   res.redirect("/urls/");
 });
 
-//When you click the logout button it signs you out by deleting cookie
-//Program recognizes you being signed in through your cookie
+
+//When you logout the session assigned null
 app.post("/logout", (req, res) => {
 
   req.session = null;
@@ -214,13 +212,15 @@ app.get("/register", (req, res) => {
   res.render("registrationPage", templateVars);
 });
 
-
+//Assigns new user to database
 app.post("/register", (req, res) => {
 
+  //Check if the user is already an existing member
   let copy = false;
   for (let i = 0; i < Object.keys(users).length; i++) {
     if (req.body.email === users[Object.keys(users)[i]].email) {
       copy = true;
+      break;
     }
   }
 
@@ -228,6 +228,8 @@ app.post("/register", (req, res) => {
     console.log("That is a copy!");
     res.status(403);
   } else {
+
+    //Create a new user in the database
     let newID = generateRandomString();
     let hashedPassword = bcrypt.hashSync(req.body.password, 10);
   
