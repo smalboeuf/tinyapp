@@ -11,6 +11,11 @@
 <body>
   <%- include('partials/_header.ejs') %>
 
+  <% if(error){ %>
+    <p class="alert alert-danger">Error: That link does not exist.</p>
+  <% } %>  
+
+
   <main style="margin: 1em;">
     <h3>Welcome to TinyApp!</h3>
     <p>Please create an account or login to start shortening your URLs!</p>
