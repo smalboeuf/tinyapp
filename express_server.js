@@ -64,8 +64,17 @@ app.post("/urls", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  templateVars = { id: req.cookies["id"]};
-  res.render("urls_new", templateVars);
+
+  
+  console.log(req.cookies["id"]);
+  if (req.cookies["id"]) {
+    let templateVars = { id: req.cookies["id"], user: users[req.cookies["id"]]};
+    res.render("urls_new", templateVars);
+  } else {
+
+    res.redirect('/login');
+  }
+
 });
 
 app.get("/urls/:shortURL", (req, res) => {
@@ -130,7 +139,8 @@ app.post("/urls/:shortURL/checkEdit", (req, res) => {
 //Login
 
 app.get("/login", (req, res) => {
-  templateVars = { id: req.cookies["id"] };
+  console.log(users[req.cookies["id"]]);
+  templateVars = { id: req.cookies["id"], user: users[req.cookies["id"]] };
   res.render("signInPage", templateVars);
 });
 
