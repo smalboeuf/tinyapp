@@ -15,7 +15,7 @@ app.set('view engine', 'ejs');
 const urlDatabase = {
   "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "randID"},
   "9sm5xK": { longURL: "http://www.google.com", userID: "fakeID"},
-  "hfj3sn": { longURL: "gluggle.com", userID: "randID"} 
+  "hfj3sn": { longURL: "gluggle.com", userID: "randID"}
 };
 
 const users = {
@@ -38,10 +38,10 @@ const users = {
 //AAAAAAAAAAAAA
 const generateRandomString = function() {
   let randomString = "";
-  let alphabet = "abcdefghijklmnopqrstuvwxyz";
+  let alphabet = "abcdefghijklmnopqrstuvwxyz1234567890";
   
   for (let i = 0; i < 6; i++) {
-    let randomNumb =  Math.floor(Math.random() * 26);
+    let randomNumb =  Math.floor(Math.random() * 36);
 
     randomString += alphabet[randomNumb];
   }
@@ -70,13 +70,14 @@ app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
-app.get("/urls", (req, res) => { 
+app.get("/urls", (req, res) => {
   let usersURLs = [];
+ 
 
   if (req.cookies["id"]) {
     usersURLs = urlsForUser(req.cookies["id"]);
   }
-  
+
   let templateVars = {id: req.cookies["id"], user: users[req.cookies["id"]], urls: usersURLs };
   
   if (req.cookies["id"]) {
@@ -87,6 +88,7 @@ app.get("/urls", (req, res) => {
  
   
 });
+
 
 app.post("/urls", (req, res) => {
   //Store the new long URL in the database with a randomly generated short URL
@@ -109,9 +111,9 @@ app.get("/urls/new", (req, res) => {
 
 app.get("/urls/:shortURL", (req, res) => {
   if (req.cookies["id"]) {
-  let templateVars = { id: req.cookies["id"], user: users[req.cookies["id"]], shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL.slice(1)] };
+    let templateVars = { id: req.cookies["id"], user: users[req.cookies["id"]], shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL.slice(1)] };
   
-  res.render("urls_show", templateVars);
+    res.render("urls_show", templateVars);
   } else {
     res.redirect('/urls');
   }
@@ -119,37 +121,39 @@ app.get("/urls/:shortURL", (req, res) => {
 
 app.get("/u/:shortURL", (req, res) => {
 
-  console.log("hello");
   let newURL = "";
   let templateVars = {};
   
-
-    if (req.params.shortURL[0] === ':') {
+  if (req.params.shortURL[0] === ':') {
     
-      newURL = urlDatabase[req.params.shortURL.slice(1)];
-      templateVars = { id: req.cookies["id"], user: users[req.cookies["id"]], shortURL: req.params.shortURL.slice(1), longURL: urlDatabase[req.params.shortURL.slice(1)]};
-      res.redirect(newURL, templateVars);
-    } else {
+    newURL = urlDatabase[req.params.shortURL.slice(1)];
+    templateVars = { id: req.cookies["id"], user: users[req.cookies["id"]], shortURL: req.params.shortURL.slice(1), longURL: urlDatabase[req.params.shortURL.slice(1)]};
+    res.redirect(newURL, templateVars);
+  } else {
       
-      newURL = urlDatabase[req.params.shortURL];
-      templateVars = { id: req.cookies["id"], user: users[req.cookies["id"]], shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL]};
-      res.redirect(newURL, templateVars);
-    }
+    newURL = urlDatabase[req.params.shortURL];
+    templateVars = { id: req.cookies["id"], user: users[req.cookies["id"]], shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL]};
+    res.redirect(newURL, templateVars);
+  }
 
 });
 
 //Deletes a shortURL from the list
 app.post("/urls/:shortURL/delete", (req, res) => {
  
-  if (req.params.shortURL[0] === ':') {
-    delete urlDatabase[req.params.shortURL.slice(1)];
+  if (req.cookies["id"]) {
+    if (req.params.shortURL[0] === ':') {
+      delete urlDatabase[req.params.shortURL.slice(1)];
+    } else {
+      delete urlDatabase[req.params.shortURL];
+    }
   } else {
-    delete urlDatabase[req.params.shortURL];
+    res.send("Don't have permission to delete.")
   }
-
 
   res.redirect("/urls/");
 });
+
 
 //When you edit an existing URL
 app.post("/urls/:shortURL/checkEdit", (req, res) => {
@@ -205,6 +209,7 @@ app.post("/login", (req, res) => {
 });
 
 //When you click the logout button it signs you out by deleting cookie
+//Program recognizes you being signed in through your cookie
 app.post("/logout", (req, res) => {
 
   res.clearCookie("id");
