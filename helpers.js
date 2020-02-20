@@ -1,5 +1,20 @@
+const bcrypt = require('bcrypt');
+
 //Helper Functions
 const getUserByEmail = function(email, database) {
+  
+  let user = undefined;
+
+  for (let i = 0; i < Object.keys(database).length; i++) {
+    if (database[Object.keys(database)[i]].email === email) {
+      user = database[Object.keys(database)[i]];
+    }
+  }
+
+  return user;
+};
+
+const getUserIDByEmail = function(email, database) {
   
   let user = undefined;
 
@@ -41,7 +56,7 @@ const urlsForUser = function(id, database) {
 const checkIfUserExists = function (email, database) {
   let exists = false;
 
-  for (let i = 0; i < Object.keys[database].length; i++) {
+  for (let i = 0; i < Object.keys(database).length; i++) {
     if (email === database[Object.keys(database)[i]].email) {
       exists = true;
       break;
@@ -52,7 +67,28 @@ const checkIfUserExists = function (email, database) {
   return exists;
 }
 
+const checkPasswordMatch = function (password, user) {
+  if (bcrypt.compareSync(password, user.password)) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+const checkUserAuthentication = function (email, password, database) {
+  
+    if (checkIfUserExists(email, database)) {
+
+      if (checkPasswordMatch(password, getUserByEmail(email, database))) {
+        return true;
+      } 
+    }
+
+    return false;
+  
+}
 
 
 
-module.exports = { getUserByEmail, generateRandomString, urlsForUser, checkIfUserExists };
+
+module.exports = { getUserByEmail, generateRandomString, urlsForUser, checkIfUserExists, checkUserAuthentication, getUserIDByEmail };

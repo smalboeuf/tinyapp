@@ -6,7 +6,7 @@ const bcrypt = require('bcrypt');
 const bodyParser = require("body-parser");
 const methodOverride = require('method-override');
 
-const { generateRandomString, urlsForUser, checkIfUserExists } = require('./helpers');
+const { generateRandomString, urlsForUser, checkIfUserExists, checkUserAuthentication, getUserIDByEmail } = require('./helpers');
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(methodOverride('_method'));
@@ -157,23 +157,15 @@ app.get("/login", (req, res) => {
 
 app.post("/login", (req, res) => {
 
-  let accountExists = false;
-
-  for (let i = 0; i < Object.keys(users).length; i++) {
-  //Checking to make sure the email and password match the database
-    if (users[Object.keys(users)[i]].email === req.body.email) {
-      accountExists = true;
-      if (bcrypt.compareSync(req.body.password, users[Object.keys(users)[i]].password)) {
-      //Create a cookie
-        req.session.user_id = users[Object.keys(users)[i]].id;
-        break;
-      } else {
-        res.status(403);
-        break;
-      }
-    }
+  //Helper function checks if user is authenticated based on form inputs
+  if (checkUserAuthentication(req.body.email, req.body.password, users)) {
+    req.session.user_id = getUserIDByEmail(req.body.email, users);
+    
+  } else {
+    res.status(403);
   }
 
+  let accountExists = checkIfUserExists(req.body.email, users);
   if (!accountExists) {
     res.status(403);
   }
