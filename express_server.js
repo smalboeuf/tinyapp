@@ -76,8 +76,11 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/:${randomString}`);
 });
 
+
+//Load page to create a new URL
 app.get("/urls/new", (req, res) => {
 
+  //Check to see if the user has a cookie
   if (req.session.user_id) {
     let templateVars = { id: req.session.user_id, user: users[req.session.user_id], error: false};
     res.render("urls_new", templateVars);
@@ -100,8 +103,23 @@ app.get("/urls/:shortURL", (req, res) => {
     //If the shortURL does not exist, go to error page
     res.redirect('/urls/:shortURL/error');
   }
+});
 
+//Override Method for deleting a link from the list
+
+app.delete("/urls/:shortURL", (req, res) => {
   
+  if (req.session.user_id) {
+    if (req.params.shortURL[0] === ':') {
+      delete urlDatabase[req.params.shortURL.slice(1)];
+    } else {
+      delete urlDatabase[req.params.shortURL];
+    }
+  } else {
+    res.send("Don't have permission to delete.");
+  }
+
+  res.redirect("/urls/");
 });
 
 //When there is an error redirect the page and show error
@@ -211,25 +229,7 @@ app.post("/register", (req, res) => {
       password: hashedPassword
     };
   }
-  
 
   res.redirect("/login");
 });
 
-
-//Override Method for deleting a link from the list
-
-app.delete("/urls/:shortURL", (req, res) => {
-  
-  if (req.session.user_id) {
-    if (req.params.shortURL[0] === ':') {
-      delete urlDatabase[req.params.shortURL.slice(1)];
-    } else {
-      delete urlDatabase[req.params.shortURL];
-    }
-  } else {
-    res.send("Don't have permission to delete.");
-  }
-
-  res.redirect("/urls/");
-});
