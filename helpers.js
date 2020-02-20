@@ -38,4 +38,21 @@ const urlsForUser = function(id, database) {
   return listOfURL;
 };
 
-module.exports = { getUserByEmail, generateRandomString, urlsForUser };
+const checkIfUserExists = function (email, database) {
+  let exists = false;
+
+  for (let i = 0; i < Object.keys[database].length; i++) {
+    if (email === database[Object.keys(database)[i]].email) {
+      exists = true;
+      break;
+    }
+  }
+
+
+  return exists;
+}
+
+
+
+
+module.exports = { getUserByEmail, generateRandomString, urlsForUser, checkIfUserExists };

@@ -4,10 +4,12 @@ const PORT = 8080; // default port 8080
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcrypt');
 const bodyParser = require("body-parser");
+const methodOverride = require('method-override');
 
-const { generateRandomString, urlsForUser } = require('./helpers');
+const { generateRandomString, urlsForUser, checkIfUserExists } = require('./helpers');
 
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(methodOverride('_method'));
 app.use(cookieSession({
   name: "session",
   keys: ["user_id"]
@@ -130,23 +132,6 @@ app.get("/u/:shortURL", (req, res) => {
 
 });
 
-//Deletes a shortURL from the list
-app.post("/urls/:shortURL/delete", (req, res) => {
- 
-  if (req.session.user_id) {
-    if (req.params.shortURL[0] === ':') {
-      delete urlDatabase[req.params.shortURL.slice(1)];
-    } else {
-      delete urlDatabase[req.params.shortURL];
-    }
-  } else {
-    res.send("Don't have permission to delete.");
-  }
-
-  res.redirect("/urls/");
-});
-
-
 //When you edit an existing URL
 app.post("/urls/:shortURL/checkEdit", (req, res) => {
  
@@ -216,13 +201,8 @@ app.get("/register", (req, res) => {
 app.post("/register", (req, res) => {
 
   //Check if the user is already an existing member
-  let copy = false;
-  for (let i = 0; i < Object.keys(users).length; i++) {
-    if (req.body.email === users[Object.keys(users)[i]].email) {
-      copy = true;
-      break;
-    }
-  }
+  let copy = checkIfUserExists(req.body.email, users);
+ 
 
   if (copy === true) {
     console.log("That is a copy!");
@@ -245,6 +225,19 @@ app.post("/register", (req, res) => {
 });
 
 
+//Override Method for deleting a link from the list
 
+app.delete("/urls/:shortURL", (req, res) => {
+  
+  if (req.session.user_id) {
+    if (req.params.shortURL[0] === ':') {
+      delete urlDatabase[req.params.shortURL.slice(1)];
+    } else {
+      delete urlDatabase[req.params.shortURL];
+    }
+  } else {
+    res.send("Don't have permission to delete.");
+  }
 
-
+  res.redirect("/urls/");
+});
