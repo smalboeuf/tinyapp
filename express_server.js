@@ -71,9 +71,14 @@ app.get("/urls", (req, res) => {
 
 app.post("/urls", (req, res) => {
   //Store the new long URL in the database with a randomly generated short URL
+  if (!req.body.longURL) {
+    templateVars = {id: req.session.user_id, user: users[req.session.user_id], error: false, errorEmpty: true};
+    res.render('urls_new', templateVars);
+  } else {
   let randomString = generateRandomString();
   urlDatabase[randomString] = {longURL: req.body.longURL, userID: req.session.user_id};
   res.redirect(`/urls/:${randomString}`);
+  }
 });
 
 
@@ -82,7 +87,7 @@ app.get("/urls/new", (req, res) => {
 
   //Check to see if the user has a cookie
   if (req.session.user_id) {
-    let templateVars = { id: req.session.user_id, user: users[req.session.user_id], error: false};
+    let templateVars = { id: req.session.user_id, user: users[req.session.user_id], error: false, errorEmpty: false};
     res.render("urls_new", templateVars);
   } else {
     res.redirect('/login');

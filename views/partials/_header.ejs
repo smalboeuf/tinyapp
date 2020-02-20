@@ -15,9 +15,10 @@
       <label>Logged in as <%= user.email %> ! &nbsp;</label>
       <form method="POST" class="inline-block" action="/logout"><button class="btn btn-outline-light">Logout</button></form>
     <% } else { %>
-      
-      <form method="GET" class= "inline-block" action="/login"><button style="display: inline-block; margin-right: 1rem;" class="btn btn-outline-light">Login</button></form> 
-      <form method="GET" class= "inline-block" action="/register"><button style="display: inline-block;" class="btn btn-outline-light">Register</button></form>
+      <div class="navbar-nav">
+      <a class="nav-item nav-link" href="/login">Login</a>
+      <a class="nav-item nav-link" href="/register">Register</a>
+      </div>
     <% } %>
       
     
