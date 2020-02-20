@@ -184,6 +184,7 @@ app.post("/login", (req, res) => {
   }
 
   let accountExists = checkIfUserExists(req.body.email, users);
+  
   if (!accountExists) {
     res.status(403);
   }
