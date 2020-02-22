@@ -44,8 +44,18 @@ const users = {
 //Ports
 ///////////////
 
+
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
+});
+
+
+app.get("/", (req, res) => {
+  if (req.session.user_id) {
+    res.redirect("/urls");
+  } else {
+    res.redirect("/login");
+  }
 });
 
 app.get("/urls.json", (req, res) => {
@@ -223,19 +233,23 @@ app.post("/register", (req, res) => {
   if (copy === true) {
     console.log("That is a copy!");
     res.status(403);
+    res.redirect("/register");
   } else {
 
     //Create a new user in the database
     let newID = generateRandomString();
     let hashedPassword = bcrypt.hashSync(req.body.password, 10);
-  
+   
     users[newID] = {
       id: newID,
       email: req.body.email,
       password: hashedPassword
     };
+
+    req.session.user_id = getUserIDByEmail(req.body.email, users);
+    res.redirect('/urls');
   }
 
-  res.redirect("/login");
+  
 });
 
