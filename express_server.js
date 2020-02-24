@@ -44,11 +44,9 @@ const users = {
 //Ports
 ///////////////
 
-
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
-
 
 app.get("/", (req, res) => {
   if (req.session.user_id) {
@@ -78,7 +76,6 @@ app.get("/urls", (req, res) => {
   }
 });
 
-
 app.post("/urls", (req, res) => {
   //Store the new long URL in the database with a randomly generated short URL
   if (!req.body.longURL) {
@@ -91,10 +88,8 @@ app.post("/urls", (req, res) => {
   }
 });
 
-
 //Load page to create a new URL
 app.get("/urls/new", (req, res) => {
-
   //Check to see if the user has a cookie
   if (req.session.user_id) {
     let templateVars = { id: req.session.user_id, user: users[req.session.user_id], error: false, errorEmpty: false};
@@ -102,7 +97,6 @@ app.get("/urls/new", (req, res) => {
   } else {
     res.redirect('/login');
   }
-
 });
 
 app.get("/urls/:shortURL", (req, res) => {
@@ -133,7 +127,6 @@ app.delete("/urls/:shortURL", (req, res) => {
   } else {
     res.send("Don't have permission to delete.");
   }
-
   res.redirect("/urls/");
 });
 
@@ -152,34 +145,26 @@ app.get("/u/:shortURL", (req, res) => {
   let templateVars = {};
   
   if (req.params.shortURL[0] === ':') {
-    
     newURL = urlDatabase[req.params.shortURL.slice(1)];
     templateVars = { id: req.session.user_id, user: users[req.session.user_id], shortURL: req.params.shortURL.slice(1), longURL: urlDatabase[req.params.shortURL.slice(1)], error: false};
     res.redirect(newURL, templateVars);
   } else {
-      
     newURL = urlDatabase[req.params.shortURL];
     templateVars = { id: req.session.user_id, user: users[req.session.user_id], shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], error: false};
     res.redirect(newURL, templateVars);
   }
-
 });
 
 //When you edit an existing URL
 app.post("/urls/:shortURL/checkEdit", (req, res) => {
- 
   //Check to see if the shortURL param comes with a : or not and then store it in the longURL
   if (req.params.shortURL[0] === ':') {
     urlDatabase[req.params.shortURL.slice(1)].longURL = req.body.longURL;
-   
   } else {
     urlDatabase[req.params.shortURL].longURL = req.body.longURL;
   }
-
-
   res.redirect("/urls/");
 });
-
 
 //Login
 
@@ -189,21 +174,16 @@ app.get("/login", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-
   //Helper function checks if user is authenticated based on form inputs
   if (checkUserAuthentication(req.body.email, req.body.password, users)) {
     req.session.user_id = getUserIDByEmail(req.body.email, users);
-    
   } else {
     res.status(403);
   }
-
   let accountExists = checkIfUserExists(req.body.email, users);
-  
   if (!accountExists) {
     res.status(403);
   }
-
   res.redirect("/urls/");
 });
 
@@ -217,7 +197,6 @@ app.post("/logout", (req, res) => {
 });
 
 //Register
-
 app.get("/register", (req, res) => {
   let templateVars = { id: req.session.user_id, user: users[req.session.user_id], error: false};
   res.render("registrationPage", templateVars);
@@ -229,7 +208,6 @@ app.post("/register", (req, res) => {
   //Check if the user is already an existing member
   let copy = checkIfUserExists(req.body.email, users);
  
-
   if (copy === true) {
     console.log("That is a copy!");
     res.status(403);
@@ -245,11 +223,8 @@ app.post("/register", (req, res) => {
       email: req.body.email,
       password: hashedPassword
     };
-
     req.session.user_id = getUserIDByEmail(req.body.email, users);
     res.redirect('/urls');
+
   }
-
-  
 });
-
